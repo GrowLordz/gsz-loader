@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 
 import rikka.shizuku.Shizuku;
@@ -14,10 +15,41 @@ import rikka.shizuku.Shizuku;
 public final class ShizukuHelper {
 
     private static final String TAG = "ShizukuHelper";
-    private ShizukuHelper() {}
+
+    private static final Method NEW_PROCESS_METHOD;
+
+    static {
+        Method method = null;
+        try {
+            method = Shizuku.class.getDeclaredMethod(
+                    "newProcess",
+                    String[].class,
+                    String[].class,
+                    String.class
+            );
+            method.setAccessible(true);
+        } catch (Throwable t) {
+            Log.e(TAG, "Shizuku.newProcess is unavailable on this version", t);
+        }
+        NEW_PROCESS_METHOD = method;
+    }
+
+    private ShizukuHelper() {
+    }
+
+    private static Process shizukuNewProcess(String[] cmd) throws Exception {
+        if (NEW_PROCESS_METHOD == null) {
+            throw new IllegalStateException("Shizuku.newProcess is unavailable");
+        }
+        return (Process) NEW_PROCESS_METHOD.invoke(null, cmd, null, null);
+    }
 
     public static boolean isBinderAlive() {
-        try { return Shizuku.pingBinder(); } catch (Throwable t) { return false; }
+        try {
+            return Shizuku.pingBinder();
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     public static boolean hasPermission() {
@@ -37,15 +69,19 @@ public final class ShizukuHelper {
         try {
             String parent = new File(absPath).getParent();
             if (parent != null) {
-                Process mk = Shizuku.newProcess(
-                        new String[]{"sh", "-c", "mkdir -p '" + parent + "'"}, null, null);
+                Process mk = shizukuNewProcess(
+                        new String[]{"sh", "-c", "mkdir -p '" + parent + "'"}
+                );
                 mk.waitFor();
                 mk.destroy();
             }
-            Process p = Shizuku.newProcess(
-                    new String[]{"sh", "-c",
-                            "cat > '" + absPath + "' && chmod 644 '" + absPath + "'"},
-                    null, null);
+
+            Process p = shizukuNewProcess(
+                    new String[]{
+                            "sh", "-c",
+                            "cat > '" + absPath + "' && chmod 644 '" + absPath + "'"
+                    }
+            );
 
             OutputStream os = p.getOutputStream();
             os.write(content.getBytes(StandardCharsets.UTF_8));
@@ -64,9 +100,9 @@ public final class ShizukuHelper {
     public static String readFileAsShell(String absPath) {
         if (!isBinderAlive() || !hasPermission()) return null;
         try {
-            Process p = Shizuku.newProcess(
-                    new String[]{"sh", "-c", "cat '" + absPath + "' 2>/dev/null"},
-                    null, null);
+            Process p = shizukuNewProcess(
+                    new String[]{"sh", "-c", "cat '" + absPath + "' 2>/dev/null"}
+            );
             InputStream is = p.getInputStream();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             byte[] buf = new byte[8192];
@@ -75,7 +111,7 @@ public final class ShizukuHelper {
             is.close();
             p.waitFor();
             p.destroy();
-            String out = bos.toString("UTF-8");
+            String out = bos.toString(StandardCharsets.UTF_8);
             return out.isEmpty() ? null : out;
         } catch (Throwable t) {
             Log.e(TAG, "readFileAsShell failed", t);
@@ -87,8 +123,9 @@ public final class ShizukuHelper {
         if (!isBinderAlive() || !hasPermission()) return false;
         try {
             for (String pkg : GamePaths.getPackages()) {
-                Process p = Shizuku.newProcess(
-                        new String[]{"sh", "-c", "pidof " + pkg}, null, null);
+                Process p = shizukuNewProcess(
+                        new String[]{"sh", "-c", "pidof " + pkg}
+                );
                 InputStream is = p.getInputStream();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 byte[] buf = new byte[256];
@@ -99,7 +136,8 @@ public final class ShizukuHelper {
                 p.destroy();
                 if (bos.size() > 0) return true;
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return false;
     }
 }
