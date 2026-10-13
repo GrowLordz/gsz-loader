@@ -1,0 +1,25 @@
+# gradle
+.gradle/
+build/
+app/build/
+
+# local config (ada path SDK, jangan di-push)
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# hasil build
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# cache
+*.log

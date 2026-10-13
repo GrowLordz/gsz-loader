@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GSZ Loader</string>
+    <string name="title">GSZ LOADER</string>
+    <string name="subtitle">Non-root external control panel</string>
+    <string name="shizuku_active">Shizuku active</string>
+    <string name="shizuku_inactive">Shizuku not connected</string>
+    <string name="shizuku_request">Request Shizuku</string>
+    <string name="btn_push">PUSH CONFIG TO GAME</string>
+    <string name="btn_reload">RELOAD FROM DISK</string>
+    <string name="btn_reset">RESET DEFAULTS</string>
+</resources>
