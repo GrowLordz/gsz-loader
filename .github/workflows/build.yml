@@ -22,17 +22,41 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Diagnostic - show repo structure
+        run: |
+          echo "=== root ==="
+          ls -la
+          echo "=== gradle/wrapper ==="
+          ls -la gradle/wrapper/ || true
+          echo "=== gradlew perms ==="
+          ls -la gradlew || true
+          echo "=== gradlew first 5 lines ==="
+          head -5 gradlew || true
+          echo "=== file command on wrapper jar ==="
+          file gradle/wrapper/gradle-wrapper.jar || true
+          echo "=== size ==="
+          du -h gradle/wrapper/gradle-wrapper.jar || true
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Verify gradle wrapper works
+        run: ./gradlew --version --no-daemon
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: List build outputs
+        if: always()
+        run: |
+          echo "=== build dir ==="
+          find app/build/outputs -type f 2>/dev/null || echo "no outputs dir"
+          ls -la app/build/outputs/apk/debug/ 2>/dev/null || true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: gsz-loader-debug
-          path: |
-            app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
