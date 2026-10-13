@@ -19,39 +19,48 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Diagnostic - show repo structure
+      - name: Install Gradle 8.7
         run: |
-          echo "=== root ==="
-          ls -la
-          echo "=== gradle/wrapper ==="
-          ls -la gradle/wrapper/ || true
-          echo "=== gradlew perms ==="
-          ls -la gradlew || true
-          echo "=== gradlew first 5 lines ==="
-          head -5 gradlew || true
-          echo "=== file command on wrapper jar ==="
-          file gradle/wrapper/gradle-wrapper.jar || true
-          echo "=== size ==="
-          du -h gradle/wrapper/gradle-wrapper.jar || true
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle-8.7-bin.zip
+          echo "$PWD/gradle-8.7/bin" >> $GITHUB_PATH
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Diagnostic - SDK discovery
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "=== searching for SDK ==="
+          for d in "$ANDROID_HOME" "$ANDROID_SDK_ROOT" /usr/local/lib/android/sdk; do
+            if [ -d "$d" ]; then
+              echo "FOUND: $d"
+              ls -la "$d"
+            fi
+          done
+          gradle --version
 
-      - name: Verify gradle wrapper works
-        run: ./gradlew --version --no-daemon
+      - name: Write local.properties
+        run: |
+          SDK=""
+          for d in "$ANDROID_HOME" "$ANDROID_SDK_ROOT" /usr/local/lib/android/sdk; do
+            if [ -d "$d" ] && [ -d "$d/platforms" ]; then SDK="$d"; break; fi
+          done
+          if [ -z "$SDK" ]; then
+            for d in "$ANDROID_HOME" "$ANDROID_SDK_ROOT" /usr/local/lib/android/sdk; do
+              if [ -d "$d" ]; then SDK="$d"; break; fi
+            done
+          fi
+          echo "Using SDK: $SDK"
+          echo "sdk.dir=$SDK" > local.properties
+          cat local.properties
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: gradle assembleDebug --no-daemon --stacktrace
 
-      - name: List build outputs
+      - name: List outputs
         if: always()
         run: |
-          echo "=== build dir ==="
+          echo "=== outputs ==="
           find app/build/outputs -type f 2>/dev/null || echo "no outputs dir"
-          ls -la app/build/outputs/apk/debug/ 2>/dev/null || true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
