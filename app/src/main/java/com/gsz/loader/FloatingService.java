@@ -14,6 +14,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,6 +42,8 @@ public class FloatingService extends Service {
     private WindowManager.LayoutParams panelParams;
 
     private boolean panelExpanded = false;
+    private boolean panelAnimatingOut = false;
+    private static final long PANEL_ANIM_MS = 220L;
     private String currentTab = "ESP";
 
     private LexusConfig config = new LexusConfig();
@@ -115,7 +119,7 @@ public class FloatingService extends Service {
                 PixelFormat.TRANSLUCENT);
         fabParams.gravity = Gravity.TOP | Gravity.START;
         fabParams.x = 0;
-        fabParams.y = 300;
+        fabParams.y = 220;
 
         attachFabDrag(fabView);
         windowManager.addView(fabView, fabParams);
@@ -145,6 +149,11 @@ public class FloatingService extends Service {
                     return true;
                 case MotionEvent.ACTION_UP:
                     if (!dragged[0]) {
+                        view.animate().cancel();
+                        view.setScaleX(0.94f);
+                        view.setScaleY(0.94f);
+                        view.animate().scaleX(1f).scaleY(1f).setDuration(120L)
+                                .setInterpolator(new DecelerateInterpolator()).start();
                         togglePanel();
                     } else {
                         int screenW = getResources().getDisplayMetrics().widthPixels;
@@ -166,6 +175,7 @@ public class FloatingService extends Service {
     }
 
     private void showPanel() {
+        if (panelExpanded || panelAnimatingOut) return;
         if (panelView != null) {
             try { windowManager.removeView(panelView); } catch (Throwable ignored) {}
             panelView = null;
@@ -205,7 +215,7 @@ public class FloatingService extends Service {
 
         // Buttons
         panelView.findViewById(R.id.btnMinimize).setOnClickListener(v -> hidePanel());
-        panelView.findViewById(R.id.btnClose).setOnClickListener(v -> { hidePanel(); stopSelf(); });
+        panelView.findViewById(R.id.btnClose).setOnClickListener(v -> hidePanel());
 
         Button reload = panelView.findViewById(R.id.btnReloadOverlay);
         reload.setOnClickListener(v -> reloadConfig());
@@ -227,12 +237,26 @@ public class FloatingService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
         panelParams.gravity = Gravity.TOP | Gravity.START;
-        panelParams.x = 40;
-        panelParams.y = 180;
+        panelParams.x = dp(12);
+        panelParams.y = dp(72);
 
+        // Start slightly smaller and lower, then ease into place for a soft pop-in.
+        panelView.setAlpha(0f);
+        panelView.setScaleX(0.94f);
+        panelView.setScaleY(0.94f);
+        panelView.setTranslationY(dp(8));
         windowManager.addView(panelView, panelParams);
         panelExpanded = true;
-        fabView.setVisibility(View.GONE);
+        if (fabView != null) {
+            fabView.animate().cancel();
+            fabView.setAlpha(0f);
+            fabView.setVisibility(View.GONE);
+            fabView.setAlpha(1f);
+        }
+        panelView.animate().alpha(1f).scaleX(1f).scaleY(1f).translationY(0f)
+                .setDuration(PANEL_ANIM_MS)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
     }
 
     private void switchTab(String tab) {
@@ -347,12 +371,26 @@ public class FloatingService extends Service {
     }
 
     private void hidePanel() {
-        if (panelView != null) {
-            try { windowManager.removeView(panelView); } catch (Throwable ignored) {}
-            panelView = null;
-        }
-        panelExpanded = false;
-        if (fabView != null) fabView.setVisibility(View.VISIBLE);
+        if (panelView == null || panelAnimatingOut) return;
+        final View closingView = panelView;
+        panelAnimatingOut = true;
+        closingView.animate().cancel();
+        closingView.animate().alpha(0f).scaleX(0.94f).scaleY(0.94f)
+                .translationY(dp(8))
+                .setDuration(180L)
+                .setInterpolator(new AccelerateInterpolator())
+                .withEndAction(() -> {
+                    try { windowManager.removeView(closingView); } catch (Throwable ignored) {}
+                    if (panelView == closingView) panelView = null;
+                    panelExpanded = false;
+                    panelAnimatingOut = false;
+                    if (fabView != null) {
+                        fabView.setAlpha(0f);
+                        fabView.setVisibility(View.VISIBLE);
+                        fabView.animate().alpha(1f).setDuration(160L)
+                                .setInterpolator(new DecelerateInterpolator()).start();
+                    }
+                }).start();
     }
 
     private void updateStatusDot() {
@@ -412,6 +450,10 @@ public class FloatingService extends Service {
         contentBuiltMisc = false;
         ensureTabContent(currentTab);
         updateMasterState();
+    }
+
+    private int dp(float value) {
+        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     private void toast(String s) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="248dp"
+    android:layout_width="220dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bg_panel"
@@ -10,7 +10,7 @@
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingStart="6dp"
@@ -91,11 +91,11 @@
     <LinearLayout
         android:id="@+id/tabRow"
         android:layout_width="match_parent"
-        android:layout_height="34dp"
+        android:layout_height="30dp"
         android:orientation="horizontal"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
-        android:paddingTop="6dp">
+        android:paddingTop="4dp">
 
         <TextView
             android:id="@+id/tabEsp"
@@ -142,7 +142,7 @@
     <LinearLayout
         android:id="@+id/masterRow"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="32dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingStart="12dp"
@@ -182,13 +182,12 @@
     <ScrollView
         android:id="@+id/scrollContent"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:maxHeight="360dp"
+        android:layout_height="240dp"
+        android:fillViewport="false"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="6dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="3dp"
         android:scrollbars="none">
 
         <FrameLayout

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="44dp"
-    android:layout_height="44dp"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
     android:background="@drawable/bg_fab">
     <TextView
         android:layout_width="match_parent"
@@ -9,6 +9,6 @@
         android:gravity="center"
         android:text="G"
         android:textColor="#0A0F0A"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:textStyle="bold" />
 </FrameLayout>
