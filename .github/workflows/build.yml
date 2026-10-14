@@ -62,10 +62,26 @@ jobs:
           echo "=== outputs ==="
           find app/build/outputs -type f 2>/dev/null || echo "no outputs dir"
 
+      - name: Record Build Identity
+        if: success()
+        run: |
+          APK_DIR="app/build/outputs/apk/debug"
+          test -f "$APK_DIR/app-debug.apk"
+          {
+            echo "COMMIT_SHA=$GITHUB_SHA"
+            echo "BRANCH=$GITHUB_REF_NAME"
+            echo "BUILD_RUN_ID=$GITHUB_RUN_ID"
+            echo "BUILD_RUN_NUMBER=$GITHUB_RUN_NUMBER"
+            echo "BUILD_TIME_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > "$APK_DIR/build-info.txt"
+          cat "$APK_DIR/build-info.txt"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
-        if: always()
+        if: success()
         with:
           name: gsz-loader-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/build-info.txt
           retention-days: 30

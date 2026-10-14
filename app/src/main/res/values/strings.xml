@@ -9,4 +9,5 @@
     <string name="btn_push">PUSH CONFIG TO GAME</string>
     <string name="btn_reload">RELOAD FROM DISK</string>
     <string name="btn_reset">RESET DEFAULTS</string>
+    <string name="btn_float">START FLOATING MENU</string>
 </resources>

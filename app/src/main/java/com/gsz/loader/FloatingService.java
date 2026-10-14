@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -28,6 +29,7 @@ import androidx.core.app.NotificationCompat;
 
 public class FloatingService extends Service {
 
+    public static final String EXTRA_CONFIG_PAYLOAD = "com.gsz.loader.EXTRA_CONFIG_PAYLOAD";
     private static final String CHANNEL_ID = "gsz_floating";
     private static final int NOTIF_ID = 1001;
 
@@ -57,7 +59,17 @@ public class FloatingService extends Service {
         super.onCreate();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         startForegroundInternal();
-        showFab();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "Allow display over other apps, then start the menu again", Toast.LENGTH_LONG).show();
+            stopSelf();
+            return;
+        }
+        try {
+            showFab();
+        } catch (Throwable t) {
+            Toast.makeText(this, "Unable to create floating button: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            stopSelf();
+        }
     }
 
     private void startForegroundInternal() {
@@ -412,11 +424,23 @@ public class FloatingService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         }
+        if (intent != null) {
+            String payload = intent.getStringExtra(EXTRA_CONFIG_PAYLOAD);
+            if (payload != null && !payload.isEmpty()) {
+                ConfigWriter.applyLuaToConfig(payload, config, customData);
+                rebuildAllTabs();
+            }
+        }
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE);
+        } else {
+            stopForeground(true);
+        }
         super.onDestroy();
         if (fabView != null) {
             try { windowManager.removeView(fabView); } catch (Throwable ignored) {}

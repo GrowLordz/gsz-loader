@@ -1,6 +1,10 @@
 package com.gsz.loader;
 
 import android.content.pm.PackageManager;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,12 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import rikka.shizuku.Shizuku;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQ_SHIZUKU = 4242;
+    private static final int REQ_OVERLAY = 4243;
 
     private TextView statusText;
     private Button btnShizuku;
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnShizuku.setOnClickListener(v -> requestShizuku());
 
+        findViewById(R.id.btnFloat).setOnClickListener(v -> startFloating());
         findViewById(R.id.btnPush).setOnClickListener(v -> pushConfig());
         findViewById(R.id.btnReload).setOnClickListener(v -> reloadFromDisk());
         findViewById(R.id.btnReset).setOnClickListener(v -> {
@@ -77,6 +84,50 @@ public class MainActivity extends AppCompatActivity {
             Shizuku.removeRequestPermissionResultListener(permListener);
         } catch (Throwable ignored) {}
         super.onDestroy();
+    }
+
+
+    private void startFloating() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            try {
+                Intent permissionIntent = new Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(permissionIntent, REQ_OVERLAY);
+            } catch (Throwable t) {
+                toast("Unable to open overlay permission settings");
+            }
+            return;
+        }
+        launchFloatingService();
+    }
+
+    private void launchFloatingService() {
+        Intent serviceIntent = new Intent(this, FloatingService.class);
+        serviceIntent.putExtra(FloatingService.EXTRA_CONFIG_PAYLOAD,
+                ConfigWriter.buildLuaPayload(config, customData));
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ContextCompat.startForegroundService(this, serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+            toast("Floating menu started. Tap the GSZ bubble to open it.");
+        } catch (Throwable t) {
+            toast("Could not start floating menu: " + t.getMessage());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_OVERLAY) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+                launchFloatingService();
+            } else {
+                toast("Overlay permission is required to show the floating menu");
+            }
+        }
     }
 
     private void refreshShizukuState() {
