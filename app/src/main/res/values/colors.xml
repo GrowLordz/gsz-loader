@@ -7,8 +7,6 @@
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#888888</color>
     <color name="text_tertiary">#666666</color>
-
-    <!-- Switch -->
     <color name="switch_thumb">#FFFFFF</color>
     <color name="switch_track">#00E676</color>
 </resources>
