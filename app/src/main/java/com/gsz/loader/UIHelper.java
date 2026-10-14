@@ -16,115 +16,149 @@ public final class UIHelper {
 
     private UIHelper() {}
 
-    private static List<FieldDef> schema() {
+    // ================= SCHEMA dengan kategori =================
+    private static List<FieldDef> schema(String category) {
         List<FieldDef> s = new ArrayList<>();
+        switch (category) {
+            case "ESP":    buildEspSchema(s);    break;
+            case "AIMBOT": buildAimSchema(s);    break;
+            case "MISC":   buildMiscSchema(s);   break;
+            case "ALL":    buildEspSchema(s); buildAimSchema(s); buildMiscSchema(s); break;
+        }
+        return s;
+    }
 
-        s.add(FieldDef.header("COMBAT / VISUAL"));
-        s.add(FieldDef.bool("FakeHWID", "Fake HWID"));
-        s.add(FieldDef.bool("AutoHead", "Auto Head (hit-reg)"));
-        s.add(FieldDef.bool("WallXuyenTuong", "Wall Xuyen Tuong V1"));
-        s.add(FieldDef.bool("ColorBodyV2", "Chams V2 (Basic)"));
-        s.add(FieldDef.bool("ColorBodyV3", "Chams V3 (Visibility)"));
-        s.add(FieldDef.bool("ColorBodyNew", "Wall Mau New"));
+    private static void buildEspSchema(List<FieldDef> s) {
+        s.add(FieldDef.header("MAIN"));
+        s.add(FieldDef.bool("EspVipPro", "ESP Type 3"));
+        s.add(FieldDef.bool("EspRadar", "Radar 360"));
+        s.add(FieldDef.bool("EspLoai5", "Box Frame"));
+        s.add(FieldDef.bool("EspLoai6", "Skeleton"));
+        s.add(FieldDef.bool("EspLoai7", "Detail Info"));
+        s.add(FieldDef.bool("EspLoai8", "Head HP"));
+        s.add(FieldDef.bool("EspLoai9", "VIP 9"));
+
+        s.add(FieldDef.header("ESP 9 DETAIL"));
+        s.add(FieldDef.bool("Esp9_Name", "Name"));
+        s.add(FieldDef.bool("Esp9_HP", "Health Bar"));
+        s.add(FieldDef.bool("Esp9_Team", "Team Color"));
+        s.add(FieldDef.bool("Esp9_Weapon", "Weapon Icon"));
+        s.add(FieldDef.bool("Esp9_Distance", "Distance"));
+        s.add(FieldDef.bool("Esp9_Line", "Snap Line"));
+        s.add(FieldDef.bool("Esp9_Skeleton", "Skeleton"));
+        s.add(FieldDef.bool("Esp9_Box", "Corner Box"));
+        s.add(FieldDef.bool("Esp9_Chevron", "Chevron"));
+        s.add(FieldDef.bool("Esp9_Status", "Status"));
+        s.add(FieldDef.bool("Esp9_VisCheck", "VisCheck"));
+        s.add(FieldDef.bool("Esp9_Count", "Counter"));
+
+        s.add(FieldDef.header("BOX ESP V3"));
+        s.add(FieldDef.bool("BoxESPEnable", "Enable Box V3"));
+        s.add(FieldDef.bool("BoxESP_bShowBox", "Box"));
+        s.add(FieldDef.bool("BoxESP_bShowHealth", "Health"));
+        s.add(FieldDef.bool("BoxESP_bShowWeapon", "Weapon"));
+        s.add(FieldDef.bool("BoxESP_bShowName", "Name"));
+        s.add(FieldDef.bool("BoxESP_bShowFlag", "Flag"));
+        s.add(FieldDef.bool("BoxESP_bShowDist", "Distance"));
+        s.add(FieldDef.bool("BoxESP_bShowState", "State"));
+        s.add(FieldDef.bool("BoxESP_bShowLines", "Snap Lines"));
+        s.add(FieldDef.bool("BoxESP_bShowCounter", "Counter"));
+
+        s.add(FieldDef.header("VEHICLE"));
+        s.add(FieldDef.bool("EspVehicle", "Enable"));
+        s.add(FieldDef.bool("EspVeh_Dacia", "Dacia"));
+        s.add(FieldDef.bool("EspVeh_UAZ", "UAZ"));
+        s.add(FieldDef.bool("EspVeh_Buggy", "Buggy"));
+        s.add(FieldDef.bool("EspVeh_Coupe", "Coupe"));
+        s.add(FieldDef.bool("EspVeh_Mirado", "Mirado"));
+        s.add(FieldDef.bool("EspVeh_Motor", "Motor"));
+        s.add(FieldDef.bool("EspVeh_Other", "Other"));
+
+        s.add(FieldDef.header("ITEM"));
+        s.add(FieldDef.bool("EspItem_Master", "Enable Item"));
+        s.add(FieldDef.bool("EspItem_AR", "AR"));
+        s.add(FieldDef.bool("EspItem_Sniper", "Sniper"));
+        s.add(FieldDef.bool("EspItem_SMG", "SMG"));
+        s.add(FieldDef.bool("EspItem_Shotgun", "Shotgun"));
+        s.add(FieldDef.bool("EspItem_LMG", "LMG"));
+        s.add(FieldDef.bool("EspItem_Pistol", "Pistol"));
+        s.add(FieldDef.bool("EspItem_Special", "Special"));
+        s.add(FieldDef.bool("EspItem_Scope", "Scope"));
+        s.add(FieldDef.bool("EspItem_Grenade", "Grenade"));
+        s.add(FieldDef.bool("EspItem_Med", "Medkit"));
+
+        s.add(FieldDef.header("WARNING"));
+        s.add(FieldDef.bool("EspBomMaster", "Bomb Master"));
+        s.add(FieldDef.bool("EspItemBom", "Ground Grenade"));
+        s.add(FieldDef.bool("EspActiveBom", "Active Bomb"));
+        s.add(FieldDef.bool("EspAimWarning", "Aim Warning"));
+        s.add(FieldDef.bool("EspAimWarningVisCheck", "Aim VisCheck"));
+
+        s.add(FieldDef.header("VISUAL"));
+        s.add(FieldDef.bool("WallXuyenTuong", "Wall V1"));
+        s.add(FieldDef.bool("ColorBodyV2", "Chams V2"));
+        s.add(FieldDef.bool("ColorBodyV3", "Chams V3"));
+        s.add(FieldDef.bool("ColorBodyNew", "Wall New"));
         s.add(FieldDef.bool("WallVehicle", "Wall Vehicle"));
         s.add(FieldDef.bool("WhiteBody", "White Body"));
         s.add(FieldDef.bool("BlackSky", "Black Sky"));
-        s.add(FieldDef.bool("WallClimb", "Wall Climb"));
-        s.add(FieldDef.bool("FastCar", "Fast Car"));
-        s.add(FieldDef.bool("WeaponGlow", "Weapon Glow"));
+        s.add(FieldDef.bool("EspAntenna", "Antenna"));
+        s.add(FieldDef.bool("EspOutline", "Outline"));
 
-        s.add(FieldDef.header("ESP MAIN"));
-        s.add(FieldDef.bool("EspVipPro", "ESP Type 3 (HP + Name)"));
-        s.add(FieldDef.bool("EspRadar", "ESP Radar 360"));
-        s.add(FieldDef.bool("EspLoai5", "ESP Type 5 (Box Frame)"));
-        s.add(FieldDef.bool("EspLoai6", "ESP Type 6 (Skeleton)"));
-        s.add(FieldDef.bool("EspLoai7", "ESP Type 7 (Detail Info)"));
-        s.add(FieldDef.bool("Esp7_SoLuong", "  Show Enemy Counter"));
-        s.add(FieldDef.bool("Esp7_VuKhi", "  Show Enemy Weapon"));
-        s.add(FieldDef.bool("Esp7_TuThe", "  Show Posture"));
-        s.add(FieldDef.bool("EspLoai8", "ESP Type 8 (Head HP)"));
-        s.add(FieldDef.bool("EspLoai9", "ESP Type 9 (VIP 9 Full)"));
-        s.add(FieldDef.bool("EspAntenna", "ESP Antenna"));
-        s.add(FieldDef.bool("EspOutline", "ESP Outline (HDR)"));
+        s.add(FieldDef.header("COLORS"));
+        s.add(FieldDef.slider("OutlineColor", "Outline Color (1-6)", 1, 6));
+        s.add(FieldDef.slider("ColorV3Hidden", "V3 Hidden (1-6)", 1, 6));
+        s.add(FieldDef.slider("ColorV3Visible", "V3 Visible (1-6)", 1, 6));
+        s.add(FieldDef.slider("ColorV3Thickness", "V3 Thickness", 1, 20));
+    }
 
-        s.add(FieldDef.header("ESP 9 DETAIL"));
-        s.add(FieldDef.bool("Esp9_Name", "  Player Name"));
-        s.add(FieldDef.bool("Esp9_HP", "  Health Bar"));
-        s.add(FieldDef.bool("Esp9_Team", "  Team Color Box"));
-        s.add(FieldDef.bool("Esp9_Weapon", "  Weapon Icon"));
-        s.add(FieldDef.bool("Esp9_Distance", "  Distance"));
-        s.add(FieldDef.bool("Esp9_Line", "  Snap Line"));
-        s.add(FieldDef.bool("Esp9_Skeleton", "  Skeleton"));
-        s.add(FieldDef.bool("Esp9_Box", "  Corner Box"));
-        s.add(FieldDef.bool("Esp9_Chevron", "  Chevron"));
-        s.add(FieldDef.bool("Esp9_Status", "  Status Open/Cover"));
-        s.add(FieldDef.bool("Esp9_VisCheck", "  Visibility Check"));
-        s.add(FieldDef.bool("Esp9_Count", "  Player/Bot Counter"));
-
-        s.add(FieldDef.header("ESP V3 BOX"));
-        s.add(FieldDef.bool("BoxESPEnable", "Enable Box ESP V3"));
-        s.add(FieldDef.bool("BoxESP_bShowBox", "  Box Corner"));
-        s.add(FieldDef.bool("BoxESP_bShowHealth", "  Health Bar"));
-        s.add(FieldDef.bool("BoxESP_bShowWeapon", "  Weapon Name"));
-        s.add(FieldDef.bool("BoxESP_bShowName", "  Player Name"));
-        s.add(FieldDef.bool("BoxESP_bShowFlag", "  Nation Flag"));
-        s.add(FieldDef.bool("BoxESP_bShowDist", "  Distance"));
-        s.add(FieldDef.bool("BoxESP_bShowState", "  State"));
-        s.add(FieldDef.bool("BoxESP_bShowLines", "  Snap Lines"));
-        s.add(FieldDef.bool("BoxESP_bShowCounter", "  Counter"));
-
-        s.add(FieldDef.header("VEHICLE ESP"));
-        s.add(FieldDef.bool("EspVehicle", "Enable Vehicle ESP"));
-        s.add(FieldDef.bool("EspVeh_Dacia", "  Dacia"));
-        s.add(FieldDef.bool("EspVeh_UAZ", "  UAZ"));
-        s.add(FieldDef.bool("EspVeh_Buggy", "  Buggy"));
-        s.add(FieldDef.bool("EspVeh_Coupe", "  Coupe RB"));
-        s.add(FieldDef.bool("EspVeh_Mirado", "  Mirado"));
-        s.add(FieldDef.bool("EspVeh_Motor", "  Motor / Scooter"));
-        s.add(FieldDef.bool("EspVeh_Other", "  Others"));
-
-        s.add(FieldDef.header("ITEM ESP"));
-        s.add(FieldDef.bool("EspItem_Master", "Enable Item ESP"));
-        s.add(FieldDef.bool("EspItem_AR", "  AR"));
-        s.add(FieldDef.bool("EspItem_Sniper", "  Sniper"));
-        s.add(FieldDef.bool("EspItem_SMG", "  SMG"));
-        s.add(FieldDef.bool("EspItem_Shotgun", "  Shotgun"));
-        s.add(FieldDef.bool("EspItem_LMG", "  LMG"));
-        s.add(FieldDef.bool("EspItem_Pistol", "  Pistol"));
-        s.add(FieldDef.bool("EspItem_Melee", "  Melee"));
-        s.add(FieldDef.bool("EspItem_Special", "  Special"));
-        s.add(FieldDef.bool("EspItem_Scope", "  Scope"));
-        s.add(FieldDef.bool("EspItem_Grenade", "  Grenade"));
-        s.add(FieldDef.bool("EspItem_Med", "  Medkit"));
-
-        s.add(FieldDef.header("BOMB / AIM WARNING"));
-        s.add(FieldDef.bool("EspBomMaster", "Enable Bomb Master"));
-        s.add(FieldDef.bool("EspItemBom", "  Ground Grenade ESP"));
-        s.add(FieldDef.bool("EspActiveBom", "  Active Bomb Warning"));
-        s.add(FieldDef.bool("EspAimWarning", "Enemy Aim Warning"));
-        s.add(FieldDef.bool("EspAimWarningVisCheck", "  Visibility Check"));
-
+    private static void buildAimSchema(List<FieldDef> s) {
         s.add(FieldDef.header("AIMBOT V2"));
-        s.add(FieldDef.bool("AimTouchEnable", "Enable Aimbot V2"));
-        s.add(FieldDef.bool("AimTouchHipfire", "  Hipfire"));
-        s.add(FieldDef.bool("AimTouchHipIgKnock", "    Ignore Knock"));
-        s.add(FieldDef.bool("AimTouchHipIgBot", "    Ignore Bot"));
-        s.add(FieldDef.bool("AimTouchHipVisCheck", "    VisCheck"));
-        s.add(FieldDef.bool("AimTouchSG", "  Shotgun"));
-        s.add(FieldDef.bool("AimTouchSGAutoFire", "    Auto Fire"));
-        s.add(FieldDef.bool("AimTouchScopeAll", "  Scope (all weapons)"));
-        s.add(FieldDef.bool("AimTouchScopeSniper", "  Sniper Scope"));
-        s.add(FieldDef.bool("AimTouchMortar", "  Mortar"));
+        s.add(FieldDef.bool("AimTouchEnable", "Enable Aimbot"));
+        s.add(FieldDef.bool("AimTouchHipfire", "Hipfire"));
+        s.add(FieldDef.bool("AimTouchHipIgKnock", "  Ignore Knock"));
+        s.add(FieldDef.bool("AimTouchHipIgBot", "  Ignore Bot"));
+        s.add(FieldDef.bool("AimTouchHipVisCheck", "  VisCheck"));
+        s.add(FieldDef.bool("AimTouchSG", "Shotgun"));
+        s.add(FieldDef.bool("AimTouchSGAutoFire", "  Auto Fire"));
+        s.add(FieldDef.bool("AimTouchScopeAll", "Scope All"));
+        s.add(FieldDef.bool("AimTouchScopeSniper", "Sniper"));
+        s.add(FieldDef.bool("AimTouchMortar", "Mortar"));
+
+        s.add(FieldDef.header("AIM VALUES"));
+        s.add(FieldDef.slider("OuterSpeed", "Outer Speed", 1, 100));
+        s.add(FieldDef.slider("InnerSpeed", "Inner Speed", 1, 100));
+        s.add(FieldDef.slider("OuterRecoil", "Outer Recoil", 0, 50));
+        s.add(FieldDef.slider("AimTouchHipSpeed", "Hip Speed", 1, 100));
+        s.add(FieldDef.slider("AimTouchHipFOV", "Hip FOV", 1, 100));
+        s.add(FieldDef.slider("AimTouchHipDist", "Hip Dist (m)", 5, 500));
+        s.add(FieldDef.slider("AimTouchScopeSpeed", "Scope Speed", 1, 100));
+        s.add(FieldDef.slider("AimTouchScopeFOV", "Scope FOV", 1, 100));
+        s.add(FieldDef.slider("AimTouchScopeDist", "Scope Dist (m)", 5, 500));
+        s.add(FieldDef.slider("AimTouchSniperSpeed", "Sniper Speed", 1, 100));
+        s.add(FieldDef.slider("AimTouchSniperFOV", "Sniper FOV", 1, 100));
+        s.add(FieldDef.slider("AimTouchSniperDist", "Sniper Dist (m)", 5, 500));
 
         s.add(FieldDef.header("SMART BULLET TRACK"));
         s.add(FieldDef.bool("SmartBT_Enable", "Enable Smart BT"));
-        s.add(FieldDef.bool("SmartBT_VisCheck", "  VisCheck"));
-        s.add(FieldDef.bool("SmartBT_IgKnock", "  Ignore Knock"));
-        s.add(FieldDef.bool("SmartBT_IgBot", "  Ignore Bot"));
-        s.add(FieldDef.slider("SmartBT_MaxDist", "  Max Dist (m)", 50, 500));
-        s.add(FieldDef.slider("SmartBT_Bone", "  Bone (1-6)", 1, 6));
-        s.add(FieldDef.slider("SmartBT_Radius", "  Radius (cm)", 0, 80));
-        s.add(FieldDef.slider("SmartBT_HitChance", "  Hit Chance %", 0, 100));
+        s.add(FieldDef.bool("SmartBT_VisCheck", "VisCheck"));
+        s.add(FieldDef.bool("SmartBT_IgKnock", "Ignore Knock"));
+        s.add(FieldDef.bool("SmartBT_IgBot", "Ignore Bot"));
+        s.add(FieldDef.slider("SmartBT_MaxDist", "Max Dist (m)", 50, 500));
+        s.add(FieldDef.slider("SmartBT_Bone", "Bone (1-6)", 1, 6));
+        s.add(FieldDef.slider("SmartBT_Radius", "Radius (cm)", 0, 80));
+        s.add(FieldDef.slider("SmartBT_HitChance", "Hit Chance %", 0, 100));
+
+        s.add(FieldDef.header("LEGACY"));
+        s.add(FieldDef.bool("AutoHead", "Auto Head"));
+        s.add(FieldDef.bool("LessShake", "Less Shake"));
+        s.add(FieldDef.bool("Accuracy", "100% Accuracy"));
+        s.add(FieldDef.bool("Crosshair", "Small Crosshair"));
+    }
+
+    private static void buildMiscSchema(List<FieldDef> s) {
+        s.add(FieldDef.header("SAFETY"));
+        s.add(FieldDef.bool("FakeHWID", "Fake HWID"));
 
         s.add(FieldDef.header("SKIN MOD"));
         s.add(FieldDef.bool("ModSkin", "Mod Skin System"));
@@ -134,57 +168,56 @@ public final class UIHelper {
         s.add(FieldDef.bool("KillMessage", "Kill Message"));
         s.add(FieldDef.bool("KillCountUI", "Kill Counter UI"));
 
-        s.add(FieldDef.header("UTILITY"));
-        s.add(FieldDef.bool("UnlockFPS", "Unlock 165 FPS"));
+        s.add(FieldDef.header("VISUAL FX"));
+        s.add(FieldDef.bool("WeaponGlow", "Weapon Glow"));
+        s.add(FieldDef.bool("WhiteBody", "White Body"));
+        s.add(FieldDef.bool("BlackSky", "Black Sky"));
+
+        s.add(FieldDef.header("PERFORMANCE"));
+        s.add(FieldDef.bool("UnlockFPS", "Unlock FPS"));
         s.add(FieldDef.bool("IpadView", "iPad View"));
-        s.add(FieldDef.bool("LessShake", "Less Scope Shake"));
         s.add(FieldDef.bool("RemoveGrass", "Remove Grass"));
         s.add(FieldDef.bool("RemoveTrees", "Remove Trees"));
         s.add(FieldDef.bool("RemoveFog", "Remove Fog"));
-        s.add(FieldDef.bool("Crosshair", "Small Crosshair"));
-        s.add(FieldDef.bool("Accuracy", "100% Accuracy"));
-        s.add(FieldDef.bool("GodMode", "Fast Shoot (Legacy)"));
 
-        s.add(FieldDef.header("NUMERIC VALUES"));
-        s.add(FieldDef.slider("OuterSpeed", "  Aimbot Outer Speed", 1, 100));
-        s.add(FieldDef.slider("InnerSpeed", "  Aimbot Inner Speed", 1, 100));
-        s.add(FieldDef.slider("OuterRecoil", "  Recoil Comp Outer", 0, 50));
-        s.add(FieldDef.slider("IpadViewFOV", "  iPad FOV", 90, 160));
-        s.add(FieldDef.slider("AimTouchHipSpeed", "  Hip Speed", 1, 100));
-        s.add(FieldDef.slider("AimTouchHipFOV", "  Hip FOV", 1, 100));
-        s.add(FieldDef.slider("AimTouchHipDist", "  Hip Max Dist (m)", 5, 500));
-        s.add(FieldDef.slider("AimTouchScopeSpeed", "  Scope Speed", 1, 100));
-        s.add(FieldDef.slider("AimTouchScopeFOV", "  Scope FOV", 1, 100));
-        s.add(FieldDef.slider("AimTouchScopeDist", "  Scope Max Dist (m)", 5, 500));
-        s.add(FieldDef.slider("AimTouchSniperSpeed", "  Sniper Speed", 1, 100));
-        s.add(FieldDef.slider("AimTouchSniperFOV", "  Sniper FOV", 1, 100));
-        s.add(FieldDef.slider("AimTouchSniperDist", "  Sniper Max Dist (m)", 5, 500));
-        s.add(FieldDef.slider("FastCarSpeed", "  Fast Car Speed", 60, 6000));
-        s.add(FieldDef.slider("OutlineColor", "  Outline Color (1-6)", 1, 6));
-        s.add(FieldDef.slider("ColorV3Hidden", "  Chams V3 Hidden", 1, 6));
-        s.add(FieldDef.slider("ColorV3Visible", "  Chams V3 Visible", 1, 6));
-        s.add(FieldDef.slider("ColorV3Thickness", "  Chams V3 Thickness", 1, 20));
+        s.add(FieldDef.header("OTHER"));
+        s.add(FieldDef.bool("FastCar", "Fast Car"));
+        s.add(FieldDef.bool("WallClimb", "Wall Climb"));
+        s.add(FieldDef.bool("GodMode", "Fast Shoot"));
 
-        return s;
+        s.add(FieldDef.header("VALUES"));
+        s.add(FieldDef.slider("IpadViewFOV", "iPad FOV", 90, 160));
+        s.add(FieldDef.slider("FastCarSpeed", "Car Speed", 60, 6000));
+        s.add(FieldDef.slider("WeaponGlowColor", "Glow Color (1-5)", 1, 5));
+        s.add(FieldDef.slider("WeaponGlowThickness", "Glow Thickness", 1, 15));
     }
 
-    public static void buildFromConfig(
-            Context ctx,
-            LinearLayout root,
-            LexusConfig cfg,
-            CustomTextData custom) {
+    // ================= BUILD KE CONTAINER =================
+    public static void buildFromConfig(Context ctx, LinearLayout root,
+                                       LexusConfig cfg, CustomTextData custom) {
+        buildCategory(ctx, root, cfg, custom, "ALL");
+    }
 
+    public static void buildCategory(Context ctx, LinearLayout root,
+                                     LexusConfig cfg, CustomTextData custom,
+                                     String category) {
         LayoutInflater inf = LayoutInflater.from(ctx);
-        for (FieldDef def : schema()) {
+        boolean isOverlay = "overlay".equals(root.getTag());
+
+        int layoutToggle = isOverlay ? R.layout.overlay_row_toggle : R.layout.row_toggle;
+        int layoutSlider = isOverlay ? R.layout.overlay_row_slider : R.layout.row_slider;
+        int layoutSection = isOverlay ? R.layout.overlay_row_section : R.layout.row_section;
+
+        for (FieldDef def : schema(category)) {
             switch (def.type) {
                 case HEADER: {
-                    View v = inf.inflate(R.layout.row_section, root, false);
+                    View v = inf.inflate(layoutSection, root, false);
                     ((TextView) v).setText(def.title);
                     root.addView(v);
                     break;
                 }
                 case BOOL: {
-                    View v = inf.inflate(R.layout.row_toggle, root, false);
+                    View v = inf.inflate(layoutToggle, root, false);
                     TextView label = v.findViewById(R.id.label);
                     Switch sw = v.findViewById(R.id.switchToggle);
                     label.setText(def.label);
@@ -195,7 +228,7 @@ public final class UIHelper {
                     break;
                 }
                 case SLIDER: {
-                    View v = inf.inflate(R.layout.row_slider, root, false);
+                    View v = inf.inflate(layoutSlider, root, false);
                     TextView label = v.findViewById(R.id.label);
                     TextView value = v.findViewById(R.id.value);
                     SeekBar bar = v.findViewById(R.id.seekBar);
@@ -221,6 +254,7 @@ public final class UIHelper {
         }
     }
 
+    // ================= REFLECTION =================
     private static boolean getBool(LexusConfig cfg, CustomTextData custom, FieldDef def) {
         Object target = def.fromCustomData ? custom : cfg;
         try {
